@@ -1,0 +1,4 @@
+export const SET_STATUS = "SET_STATUS";
+export const SET_PLAYER_ACTION = "SET_PLAYER_ACTION";
+export const SET_FIELD = "SET_FIELD";
+export const SET_CURRENT_PLAYER = "SET_CURRENT_PLAYER";
