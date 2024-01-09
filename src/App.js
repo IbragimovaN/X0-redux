@@ -2,7 +2,7 @@ import styles from "./App.module.css";
 import { useState, useEffect } from "react";
 import { winnerFunc } from "./utills";
 import { STATUS, PLAYER, PLAYER_SIGN, PLAYER_NAME } from "./constants";
-import { createStore } from "redux";
+import { legacy_createStore as createStore } from "redux";
 import { appReduser } from "./reduser";
 import { initialState } from "./reduser";
 import {
