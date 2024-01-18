@@ -1,82 +1,75 @@
 import styles from "./App.module.css";
-import { useState, useEffect } from "react";
 import { winnerFunc } from "./utills";
 import { STATUS, PLAYER, PLAYER_SIGN, PLAYER_NAME } from "./constants";
 import { legacy_createStore as createStore } from "redux";
 import { appReduser } from "./reduser";
-import { initialState } from "./reduser";
+import { useDispatch } from "react-redux";
 import {
-	SET_STATUS,
-	SET_PLAYER_ACTION,
-	SET_FIELD,
-	SET_CURRENT_PLAYER,
-} from "./constants/actions";
+	setCurrentPlayer,
+	setField,
+	setPlayerAction,
+	setStatus,
+} from "./actions";
 
-const store = createStore(appReduser, initialState);
+import { useSelector } from "react-redux";
+
+export const store = createStore(appReduser);
 
 export const App = () => {
-	const [state, setState] = useState(store.getState());
-
-	useEffect(() => {
-		const unsubscribe = store.subscribe(() => {
-			setState(store.getState());
-		});
-
-		return () => unsubscribe();
-	}, [state]);
+	const dispatch = useDispatch();
+	const status = useSelector((state) => state.status);
+	const field = useSelector((state) => state.field);
+	const currentPlayer = useSelector((state) => state.currentPlayer);
+	const playerAction = useSelector((state) => state.playerAction);
 
 	const onCellClick = (index) => {
-		if (state.status !== STATUS.WIN) {
-			if (state.field[index] === PLAYER.NOBODY) {
-				const newField = [...state.field];
-				newField[index] = state.currentPlayer;
+		if (status !== STATUS.WIN) {
+			if (field[index] === PLAYER.NOBODY) {
+				const newField = [...field];
+				newField[index] = currentPlayer;
 
-				store.dispatch({
-					type: SET_CURRENT_PLAYER,
-					payload:
-						state.currentPlayer === PLAYER.CROSS ? PLAYER.NOUGHT : PLAYER.CROSS,
-				});
+				store.dispatch(
+					setCurrentPlayer(
+						currentPlayer === PLAYER.CROSS ? PLAYER.NOUGHT : PLAYER.CROSS,
+					),
+				);
 
-				store.dispatch({ type: SET_FIELD, payload: newField });
+				store.dispatch(setField(newField));
 
-				if (winnerFunc(newField, state.currentPlayer)) {
-					store.dispatch({ type: SET_STATUS, payload: STATUS.WIN });
-					store.dispatch({ type: SET_PLAYER_ACTION, payload: "победил" });
-					store.dispatch({
-						type: SET_CURRENT_PLAYER,
-						payload: PLAYER.CROSS ? PLAYER.NOUGHT : PLAYER.CROSS,
-					});
+				if (winnerFunc(newField, currentPlayer)) {
+					dispatch(setStatus(STATUS.WIN));
+					dispatch(setPlayerAction("победил"));
+					dispatch(
+						setCurrentPlayer(PLAYER.CROSS ? PLAYER.NOUGHT : PLAYER.CROSS),
+					);
 				} else if (newField.every((item) => item !== PLAYER.NOBODY)) {
-					store.dispatch({ type: SET_PLAYER_ACTION, payload: "ничья" });
-					store.dispatch({
-						type: SET_CURRENT_PLAYER,
-						payload: PLAYER.NOBODY,
-					});
-					store.dispatch({ type: SET_STATUS, payload: STATUS.WIN });
+					dispatch(setPlayerAction("ничья"));
+					dispatch(setCurrentPlayer(PLAYER.NOBODY));
+					dispatch(setStatus(STATUS.WIN));
 				}
 			}
 		}
 	};
 
 	const onClickStartGame = () => {
-		store.dispatch({ type: SET_CURRENT_PLAYER, payload: PLAYER.CROSS });
-		store.dispatch({ type: SET_STATUS, payload: STATUS.TURN });
+		dispatch(setCurrentPlayer(PLAYER.CROSS));
+		dispatch(setStatus(STATUS.TURN));
 		const newField = new Array(9).fill(PLAYER.NOBODY);
-		store.dispatch({ type: SET_FIELD, payload: newField });
-		store.dispatch({ type: SET_PLAYER_ACTION, payload: "ходит" });
+		dispatch(setField(newField));
+		dispatch(setPlayerAction("ходит"));
 	};
 
 	return (
 		<div className={styles.app}>
-			<div>{`${state.playerAction}  ${PLAYER_NAME[state.currentPlayer]}`}</div>
+			<div>{`${playerAction}  ${PLAYER_NAME[currentPlayer]}`}</div>
 			<div className={styles.field}>
-				{state.field.map((item, index) => (
+				{field.map((item, index) => (
 					<button key={index} onClick={() => onCellClick(index)}>
 						{PLAYER_SIGN[item]}
 					</button>
 				))}
 			</div>
-			{state.status === STATUS.WIN ? (
+			{status === STATUS.WIN ? (
 				<button onClick={onClickStartGame}>начать игру заново</button>
 			) : (
 				""

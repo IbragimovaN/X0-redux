@@ -4,7 +4,7 @@ import {
 	SET_PLAYER_ACTION,
 	SET_FIELD,
 	SET_CURRENT_PLAYER,
-} from "./constants/actions";
+} from "./actions";
 
 export const initialState = {
 	field: Array(9).fill(PLAYER.NOBODY),
