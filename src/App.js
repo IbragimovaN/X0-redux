@@ -10,17 +10,18 @@ import {
 	setPlayerAction,
 	setStatus,
 } from "./actions";
-
-import { useSelector } from "react-redux";
+import { connect } from "react-redux";
 
 export const store = createStore(appReduser);
 
-export const App = () => {
-	const dispatch = useDispatch();
-	const status = useSelector((state) => state.status);
-	const field = useSelector((state) => state.field);
-	const currentPlayer = useSelector((state) => state.currentPlayer);
-	const playerAction = useSelector((state) => state.playerAction);
+export const AppContainer = ({
+	status,
+	field,
+	currentPlayer,
+	playerAction,
+	dispatch,
+}) => {
+	// const dispatch = useDispatch();
 
 	const onCellClick = (index) => {
 		if (status !== STATUS.WIN) {
@@ -77,3 +78,12 @@ export const App = () => {
 		</div>
 	);
 };
+
+const mapStateToProps = (state) => ({
+	status: state.status,
+	field: state.field,
+	currentPlayer: state.currentPlayer,
+	playerAction: state.playerAction,
+});
+
+export const App = connect(mapStateToProps)(AppContainer);
